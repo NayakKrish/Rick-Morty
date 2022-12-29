@@ -1,7 +1,25 @@
 import styled from "@emotion/styled";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { useGetCharacterDetailsQuery } from "../../redux/baseApiSlice";
 
 const MainPage = () => {
+  const [pageNo, setPageNo] = useState(1);
+  const { data } = useGetCharacterDetailsQuery({pageNo: pageNo});
+  const [CharacterData, setCharacterData] = useState(data?.results ? data?.results : []);
+
+  const fetchData = () => {
+    setPageNo(pageNo + 1);
+  };
+
+  useEffect(() => {
+    if (data) {
+      setCharacterData([...CharacterData, ...data?.results]);
+    }
+  }, [data]);
+
+  // const CharacterData = data?.results;
+  console.log("krish", CharacterData);
   return (
     <>
       <Main>
@@ -9,30 +27,63 @@ const MainPage = () => {
           <h1>Rick & Morty</h1>
         </TitleDiv>
 
-        <div>
-          <CharacterCard>
-            <img src="./demo.jpg" alt="demoimg" height={200} width={300} />
-            <div>
-              <h3>Rick & Morty</h3>
-              <InfoDiv>
-                <TitleTexts>Id:</TitleTexts>
-                <DetailsTexts>361</DetailsTexts>
-              </InfoDiv>
-              <InfoDiv>
-                <TitleTexts>Status:</TitleTexts>
-                <DetailsTexts>Dead</DetailsTexts>
-              </InfoDiv>
-              <InfoDiv>
-                <TitleTexts>Species:</TitleTexts>
-                <DetailsTexts>Humanoid</DetailsTexts>
-              </InfoDiv>
-              <InfoDiv>
-                <TitleTexts>Gender:</TitleTexts>
-                <DetailsTexts>Male</DetailsTexts>
-              </InfoDiv>
-            </div>
-          </CharacterCard>
-        </div>
+        {/* <MainContainer> */}
+          <InfiniteScroll
+            dataLength={CharacterData?.length ? CharacterData?.length : 0} //This is important field to render the next data
+            next={fetchData}
+            hasMore={CharacterData?.length > 0 ? true : false}
+            loader={<h4>Loading...</h4>}
+            endMessage={
+              <p style={{ textAlign: "center" }}>
+                <b>Yay! You have seen it all</b>
+              </p>
+            }
+            style={{
+              width: "100%",
+              overflow: "visible",
+              display: "flex",
+              justifyContent: "space-evenly",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {CharacterData?.map(
+              ({ gender, id, status, species, name, image, created }) => {
+                return (
+                  <CharacterCard key={id}>
+                    <div>
+                      <img
+                        src={image}
+                        alt="demoimg"
+                        width={"100%"}
+                        height={"50%"}
+                      />
+                    </div>
+                    <div>
+                      <h3>{name}</h3>
+                      <InfoDiv>
+                        <TitleTexts>Status:</TitleTexts>
+                        <DetailsTexts>{status}</DetailsTexts>
+                      </InfoDiv>
+                      <InfoDiv>
+                        <TitleTexts>Species:</TitleTexts>
+                        <DetailsTexts>{species}</DetailsTexts>
+                      </InfoDiv>
+                      <InfoDiv>
+                        <TitleTexts>Gender:</TitleTexts>
+                        <DetailsTexts>{gender}</DetailsTexts>
+                      </InfoDiv>
+                      <InfoDiv>
+                        <TitleTexts>Created:</TitleTexts>
+                        <DetailsTexts>{created}</DetailsTexts>
+                      </InfoDiv>
+                    </div>
+                  </CharacterCard>
+                );
+              }
+            )}
+          </InfiniteScroll>
+        {/* </MainContainer> */}
       </Main>
     </>
   );
@@ -41,6 +92,13 @@ const MainPage = () => {
 export default MainPage;
 
 const Main = styled("div")({});
+
+const MainContainer = styled("div")({
+  display: "flex",
+  justifyContent: "space-evenly",
+  alignItems: "center",
+  flexWrap: "wrap",
+});
 
 const TitleDiv = styled("div")({
   display: "flex",
@@ -52,7 +110,7 @@ const CharacterCard = styled("div")({
   boxShadow: "1px 3px 5px grey",
   margin: "2vh",
   borderRadius: "1vh",
-  width: "30%",
+  // width: "25%",
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
@@ -62,7 +120,7 @@ const CharacterCard = styled("div")({
 const InfoDiv = styled("div")({
   display: "flex",
   alignItems: "center",
-  margin: '1vh'
+  margin: "1vh",
 });
 const TitleTexts = styled("p")({
   padding: 0,
@@ -72,5 +130,5 @@ const TitleTexts = styled("p")({
 const DetailsTexts = styled("p")({
   padding: 0,
   margin: 0,
-  marginLeft: '1vw'
+  marginLeft: "1vw",
 });
