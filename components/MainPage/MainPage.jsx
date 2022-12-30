@@ -1,12 +1,21 @@
 import styled from "@emotion/styled";
 import React, { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useGetCharacterDetailsQuery } from "../../redux/baseApiSlice";
+import {
+  useGetCharacterDetailsQuery,
+  useGetCharactersLocationDataQuery,
+} from "../../redux/baseApiSlice";
 
 const MainPage = () => {
   const [pageNo, setPageNo] = useState(1);
-  const { data } = useGetCharacterDetailsQuery({pageNo: pageNo});
-  const [CharacterData, setCharacterData] = useState(data?.results ? data?.results : []);
+  const { data } = useGetCharacterDetailsQuery({ pageNo: pageNo });
+  const [CharacterData, setCharacterData] = useState(
+    data?.results ? data?.results : []
+  );
+  const [locationData, setLocationData] = useState();
+  const { data: LocationData } = useGetCharactersLocationDataQuery({
+    url: locationData,
+  });
 
   const fetchData = () => {
     setPageNo(pageNo + 1);
@@ -16,10 +25,12 @@ const MainPage = () => {
     if (data) {
       setCharacterData([...CharacterData, ...data?.results]);
     }
+    setLocationData(CharacterData?.map(({ location: { url } }) => {url}))
   }, [data]);
+  console.log("location:->", LocationData);
 
   // const CharacterData = data?.results;
-  console.log("krish", CharacterData);
+  console.log("krish", data);
   return (
     <>
       <Main>
@@ -28,61 +39,70 @@ const MainPage = () => {
         </TitleDiv>
 
         {/* <MainContainer> */}
-          <InfiniteScroll
-            dataLength={CharacterData?.length ? CharacterData?.length : 0} //This is important field to render the next data
-            next={fetchData}
-            hasMore={CharacterData?.length > 0 ? true : false}
-            loader={<h4>Loading...</h4>}
-            endMessage={
-              <p style={{ textAlign: "center" }}>
-                <b>Yay! You have seen it all</b>
-              </p>
+        <InfiniteScroll
+          dataLength={CharacterData?.length ? CharacterData?.length : 0} //This is important field to render the next data
+          next={fetchData}
+          hasMore={CharacterData?.length > 0 ? true : false}
+          loader={<h4>Loading...</h4>}
+          endMessage={
+            <p style={{ textAlign: "center" }}>
+              <b>Yay! You have seen it all</b>
+            </p>
+          }
+          style={{
+            width: "100%",
+            overflow: "visible",
+            display: "flex",
+            justifyContent: "space-evenly",
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          {CharacterData?.map(
+            ({
+              gender,
+              id,
+              status,
+              species,
+              name,
+              image,
+              created,
+              location: { url },
+            }, index) => {
+              return (
+                <CharacterCard key={index}>
+                  <div>
+                    <img
+                      src={image}
+                      alt="demoimg"
+                      width={"100%"}
+                      height={"50%"}
+                    />
+                  </div>
+                  <div>
+                    <h3>{name}</h3>
+                    <InfoDiv>
+                      <TitleTexts>Status:</TitleTexts>
+                      <DetailsTexts>{status}</DetailsTexts>
+                    </InfoDiv>
+                    <InfoDiv>
+                      <TitleTexts>Species:</TitleTexts>
+                      <DetailsTexts>{species}</DetailsTexts>
+                    </InfoDiv>
+                    <InfoDiv>
+                      <TitleTexts>Gender:</TitleTexts>
+                      <DetailsTexts>{gender}</DetailsTexts>
+                    </InfoDiv>
+                    <InfoDiv>
+                      <TitleTexts>Created:</TitleTexts>
+                      <DetailsTexts>{created}</DetailsTexts>
+                    </InfoDiv>
+                  </div>
+                </CharacterCard>
+              );
             }
-            style={{
-              width: "100%",
-              overflow: "visible",
-              display: "flex",
-              justifyContent: "space-evenly",
-              alignItems: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            {CharacterData?.map(
-              ({ gender, id, status, species, name, image, created }) => {
-                return (
-                  <CharacterCard key={id}>
-                    <div>
-                      <img
-                        src={image}
-                        alt="demoimg"
-                        width={"100%"}
-                        height={"50%"}
-                      />
-                    </div>
-                    <div>
-                      <h3>{name}</h3>
-                      <InfoDiv>
-                        <TitleTexts>Status:</TitleTexts>
-                        <DetailsTexts>{status}</DetailsTexts>
-                      </InfoDiv>
-                      <InfoDiv>
-                        <TitleTexts>Species:</TitleTexts>
-                        <DetailsTexts>{species}</DetailsTexts>
-                      </InfoDiv>
-                      <InfoDiv>
-                        <TitleTexts>Gender:</TitleTexts>
-                        <DetailsTexts>{gender}</DetailsTexts>
-                      </InfoDiv>
-                      <InfoDiv>
-                        <TitleTexts>Created:</TitleTexts>
-                        <DetailsTexts>{created}</DetailsTexts>
-                      </InfoDiv>
-                    </div>
-                  </CharacterCard>
-                );
-              }
-            )}
-          </InfiniteScroll>
+          )}
+        </InfiniteScroll>
         {/* </MainContainer> */}
       </Main>
     </>

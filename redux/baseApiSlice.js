@@ -11,9 +11,14 @@ export const baseApiSlice = createApi({
         url: `https://rickandmortyapi.com/api/character?page=${pageNo}`,
       }),
     }),
+    getCharactersLocationData: builder.query({
+      query: ({url}) => ({
+        url: `${url}`,
+      }),
+    }),
   }),
 });
 
 export default baseApiSlice.reducer;
 
-export const {useGetCharacterDetailsQuery} = baseApiSlice;
+export const {useGetCharacterDetailsQuery, useGetCharactersLocationDataQuery} = baseApiSlice;
