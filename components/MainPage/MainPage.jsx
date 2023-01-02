@@ -25,9 +25,7 @@ const MainPage = () => {
     if (data) {
       setCharacterData([...CharacterData, ...data?.results]);
     }
-    setLocationData(CharacterData?.map(({ location: { url } }) => {url}))
   }, [data]);
-  console.log("location:->", LocationData);
 
   // const CharacterData = data?.results;
   console.log("krish", data);
@@ -59,16 +57,19 @@ const MainPage = () => {
           }}
         >
           {CharacterData?.map(
-            ({
-              gender,
-              id,
-              status,
-              species,
-              name,
-              image,
-              created,
-              location: { url },
-            }, index) => {
+            (
+              {
+                gender,
+                id,
+                status,
+                species,
+                name,
+                image,
+                created,
+                location: { url },
+              },
+              index
+            ) => {
               return (
                 <CharacterCard key={index}>
                   <div>
@@ -127,7 +128,7 @@ const TitleDiv = styled("div")({
   backgroundColor: "#bcc5ce",
 });
 const CharacterCard = styled("div")({
-  boxShadow: "1px 3px 5px grey",
+  boxShadow: "3px 4px 15px grey",
   margin: "2vh",
   borderRadius: "1vh",
   // width: "25%",
@@ -136,6 +137,7 @@ const CharacterCard = styled("div")({
   justifyContent: "center",
   alignItems: "center",
   padding: "2vh",
+  // backgroundColor: "grey",
 });
 const InfoDiv = styled("div")({
   display: "flex",
